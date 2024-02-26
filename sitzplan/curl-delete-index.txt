@@ -1,0 +1,4 @@
+curl --location --request DELETE 'http://sitzplan.ece.prod.lkw-walter.com:9200/sitzplan' \
+--header 'Authorization: Basic xxxx' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json'
