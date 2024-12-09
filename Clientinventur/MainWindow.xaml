@@ -1,0 +1,26 @@
+<Window x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WrongWindowsVersion"
+        mc:Ignorable="d"
+        Title="Falsche Windows Version gefunden" Height="500" Width="700" Topmost="True" WindowStartupLocation="CenterScreen" WindowState="Maximized" Background="#FFAA1919" Foreground="Black" BorderBrush="#FF552A2A" OpacityMask="Black" WindowStyle="ThreeDBorderWindow">
+    <Grid>
+        <StackPanel>
+            <Label Content= "A C H T U N G"  Margin="10,10,10,10" HorizontalAlignment="Center" Foreground="#FFF3FF00" Panel.ZIndex="-4" FontSize="72" FontWeight="Bold"/>
+            <Label Content= "falsche Windows Version installiert"  Margin="10,10,10,10" HorizontalAlignment="Center" FontWeight="Bold" FontSize="36" Foreground="#FFFFE800"/>
+            <WrapPanel Margin="0,30,0,0">
+                <Label Content= "Erwartete Version:"  Margin="10,10,10,10" HorizontalAlignment="Center" FontWeight="Bold" FontSize="20"/>
+                <Label x:Name="Lbl_EstimatedWinVersion" Content= "EstimatedWinVersion"  Margin="10,10,10,10" HorizontalAlignment="Center" FontSize="20"/>
+            </WrapPanel>
+            <WrapPanel Margin="0,30,0,0">
+                <Label Content= "Installierte Version:"  Margin="10,10,10,10" HorizontalAlignment="Center" FontWeight="Bold" FontSize="20"/>
+                <Label x:Name="Lbl_InstalledWinVersion" Content= "InstalledWinVersion"  Margin="10,10,10,10" HorizontalAlignment="Center" FontSize="20"/>
+            </WrapPanel>
+            
+
+        </StackPanel>
+
+    </Grid>
+</Window>
