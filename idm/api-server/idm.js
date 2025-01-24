@@ -13,6 +13,7 @@
 // 24.927.1 - invokeIdmRest allKey = true - es wird versucht den richtigen key Namen automatisch zu ermitteln
 // 24.1126.1 - getIdmRoleMember, addIdmRoleMember,removeIdmRoleMember im Erfolgsfall ebenfalls einen Status ('ok') zurückmelden
 // 24.1129.1 - invokeIdmRest - console.log body eingefügt
+// 25.124.1 - doDebug kann bei initIdm übergeben werden (Standardmäßig false - als {debug})
 
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const axios = require('axios');
@@ -20,7 +21,7 @@ const https = require('https');
 const agent = new https.Agent({
   rejectUnauthorized: false,
 });
-const doDebug = false;
+let doDebug = false;
 const STATUS_OK = 'ok';
 const idmConfig = {};
 let client; // da wird der axios Client gespeichert
@@ -35,7 +36,7 @@ const createAxiosClient = () => axios.create({
 
 require('dotenv').config();
 
-function initIdm() {
+function initIdm({ debug = false } = {}) {
   idmConfig['IDM_SERVER'] = process.env.IDM_SERVER || 'wipidm03.lkw-walter.com',
     idmConfig['IDM_BASEURL'] = `https://${idmConfig['IDM_SERVER']}/`;
 
@@ -48,7 +49,7 @@ function initIdm() {
 
   idmConfig['IDM_SERVICE_USERNAME'] = process.env.IDM_SERVICE_USERNAME;
   idmConfig['IDM_SERVICE_PASSWORD'] = atob(process.env.IDM_SERVICE_PASSWORD); // atob decodiert base64 Strings
-
+  doDebug = debug;
   return idmConfig;
 }
 
