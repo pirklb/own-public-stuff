@@ -6,14 +6,15 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function main(fn) {
+async function main(fn = '/tmp/r10-raw.json', skipBlocks = -1) {
     console.log('initializing');
+    //idm.initIdm({ debug: true });
     idm.initIdm();
     console.log('login');
     await idm.idmLogin();
     console.log('getting it roles');
     let r10;
-    if (!fn) {
+    if (!fs.existsSync(fn)) {
         r10 = await idm.invokeIdmRest('IDMProv/rest/catalog/roles/listV2?nextIndex=1&q=*&sortOrder=asc&sortBy=name&roleLevel=10&size=7000', 'GET', {}, {}, 'roles');
         const j10 = JSON.stringify(r10, null, 2);
         fs.writeFileSync('/tmp/r10-raw.json', j10, { encoding: "utf8" });
@@ -29,25 +30,30 @@ async function main(fn) {
         if (blockIndex > 200) {
             blockIndex = 0;
             block++;
-            json = JSON.stringify(arrRoles, null, 2);
-            fs.writeFileSync(`/tmp/r10-${block}.json`, json, { encoding: "utf8" });
-            console.log(`written new data file - /tmp/r10-${block}.json`);
-        }
-        let r = r10[ndx];
-        let id = r.id;
-        console.log(`${ndx}. Processing ${id}`);
-        let b = `{"id":"${id}"}`;
-        if (!id.toLowerCase().startsWith('cn=wurmlogin_')) {
-            if (!simulate) {
-                let res = await idm.invokeIdmRest('IDMProv/rest/catalog/roles/mappedResources/list?nextIndex=1&size=50&q=*&driverID=', 'POST', b, {}, '');
-                let parents = await idm.invokeIdmRest('IDMProv/rest/catalog/roles/parentRoles/list?size=50&q=*&nextIndex=1', 'POST', b, {}, '');
-                let assignments = await idm.invokeIdmRest('IDMProv/rest/catalog/roles/role/assignments/v2?nextIndex=1&q=&sortOrder=asc&sortBy=name&size=100', 'POST', b, {}, '');
-                arrRoles.push({ id, res, parents, assignments });
+            if (skipBlocks < block) {
+                json = JSON.stringify(arrRoles, null, 2);
+                fs.writeFileSync(`/tmp/r10-${block}.json`, json, { encoding: "utf8" });
+                console.log(`written new data file - /tmp/r10-${block}.json`);
             }
-        } else {
-            console.log(`************************** Skipping ${id} ***`);
         }
-        await sleep(250);
+        if (skipBlocks < block) {
+            let r = r10[ndx];
+            let id = r.id;
+            console.log(`${ndx}. Processing ${id}`);
+            let b = `{"id":"${id}"}`;
+            let bAssignments = `{"dn":"${id}"}`
+            if (!id.toLowerCase().startsWith('cn=wurmlogin_')) {
+                if (!simulate) {
+                    let res = await idm.invokeIdmRest('IDMProv/rest/catalog/roles/mappedResources/list?nextIndex=1&size=50&q=*&driverID=', 'POST', b, {}, '');
+                    let parents = await idm.invokeIdmRest('IDMProv/rest/catalog/roles/parentRoles/list?size=50&q=*&nextIndex=1', 'POST', b, {}, '');
+                    let assignments = await idm.invokeIdmRest('IDMProv/rest/catalog/roles/role/assignments/v2?nextIndex=1&q=&sortOrder=asc&sortBy=name&size=500', 'POST', bAssignments, {}, '');
+                    arrRoles.push({ id, res, parents, assignments });
+                }
+                await sleep(250);
+            } else {
+                console.log(`************************** Skipping ${id} ***`);
+            }
+        }
     }
     if (!simulate) {
         const json = JSON.stringify(arrRoles, null, 2);
@@ -57,5 +63,5 @@ async function main(fn) {
 }
 
 console.log('calling main');
-main('/tmp/r10-raw.json');
+main('/tmp/r10-raw.json', 15);
 console.log('finished');

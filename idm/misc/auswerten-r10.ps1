@@ -1,5 +1,5 @@
-$fn = 'C:\temp\2025q1\r10-4.json'
-$j = get-content C:\temp\2025q1\r10-4.json | ConvertFrom-Json
+$fn = 'C:\temp\2025q1\r10-16.json'
+$j = get-content $fn | ConvertFrom-Json
 
 # Resourcen (.res.resources[])
 # (id) - technische Id der Resource
@@ -34,8 +34,8 @@ $infos = $j | ForEach-Object {
             [PSCustomObject]@{
                 ressourcename       = $res.Name
                 entitlement         = $res.entitlementValues.value
-                resourceDescription = $res.description
-                mappingDescription  = $res.mappingDescription
+                resourceDescription = $res.description -replace ("`n", '<newline>')
+                mappingDescription  = $res.mappingDescription -replace ("`n", '<newline>')
             }
         }
         parentRoles       = $role.parents.roles | ForEach-Object {
@@ -43,7 +43,7 @@ $infos = $j | ForEach-Object {
             [PSCustomObject]@{
                 parentRoleName     = $parent.name
                 roleLevel          = $parent.roleLevel.level
-                requestDescription = $parent.requestDescription
+                requestDescription = $parent.requestDescription -replace ("`n", '<newline>')
             }
         }
         directAssignments = $role.assignments.assignmentStatusList | ForEach-Object {
@@ -88,3 +88,6 @@ $alles = $infos | foreach-object {
         }
     }
 }
+
+$alles | Export-Csv -path c:\temp\2025q1\r10-final.csv -NoTypeInformation -Delimiter ';' -Encoding UTF8
+
